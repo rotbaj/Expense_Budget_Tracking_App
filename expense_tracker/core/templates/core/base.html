@@ -1,48 +1,14 @@
+{% load static %}  <!-- Add this line at the top of the file -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Expense & Budget Tracker{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}"> 
 </head>
 <body>
-    <heade<!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>{% block title %}Expense & Budget Tracker{% endblock %}</title>
-            <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-        </head>
-        <body>
-            <header>
-                <nav>
-                    <ul>
-                        <li><a href="{% url 'index' %}">Home</a></li>
-                        <li><a href="{% url 'expense_list' %}">Expenses</a></li>
-                        <li><a href="{% url 'income_list' %}">Income</a></li>
-                        <li><a href="{% url 'budget_list' %}">Budgets</a></li>
-                        <li><a href="{% url 'login' %}">Login</a></li>
-                        <li><a href="{% url 'register' %}">Register</a></li>
-                    </ul>
-                </nav>
-            </header>
-        
-            <div class="content">
-                {% block content %}
-                <!-- Page-specific content goes here -->
-                {% endblock %}
-            </div>
-        
-            <footer>
-                <p>&copy; 2025 Expense & Budget Tracker</p>
-            </footer>
-        
-            <!-- Link to the JavaScript file -->
-            <script src="{% static 'js/script.js' %}"></script>
-        </body>
-        </html>r>
+    <header>
         <nav>
             <ul>
                 <li><a href="{% url 'index' %}">Home</a></li>
@@ -65,6 +31,6 @@
         <p>&copy; 2025 Expense & Budget Tracker</p>
     </footer>
 
-    <script src="{% static 'js/scripts.js' %}"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>  <!-- This will now work -->
 </body>
 </html>
