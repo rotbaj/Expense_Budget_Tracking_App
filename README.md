@@ -58,6 +58,10 @@ To set up a new Django project for the Expense & Budget Tracker, including envir
         * `start_date` (Date)
         * `end_date` (Date)
 * Run migrations:
+    ```bash
     python manage.py makemigrations core
+    ```
+    ```bash
     python manage.py migrate
+    ```
 
