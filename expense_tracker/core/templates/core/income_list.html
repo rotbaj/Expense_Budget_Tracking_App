@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Income - Expense & Budget Tracker{% endblock %}
+
+{% block content %}
+<h1>Income</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>Amount</th>
+            <th>Description</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for income in incomes %}
+        <tr>
+            <td>{{ income.category }}</td>
+            <td>{{ income.amount }}</td>
+            <td>{{ income.description }}</td>
+            <td>{{ income.date }}</td>
+            <td>
+                <a href="{% url 'edit_income' income.id %}">Edit</a>
+                <a href="{% url 'delete_income' income.id %}" class="delete-button">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'add_income' %}">Add Income</a>
+{% endblock %}

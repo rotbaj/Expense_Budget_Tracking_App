@@ -1,0 +1,12 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Add/Edit Expense - Expense & Budget Tracker{% endblock %}
+
+{% block content %}
+<h1>{% if form.instance.id %}Edit Expense{% else %}Add Expense{% endif %}</h1>
+<form id="expense-form" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+</form>
+{% endblock %}
