@@ -1,45 +1,214 @@
-/* Basic reset */
+/* Basic reset with modern box-sizing */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Variables for color scheme and easy customization */
+:root {
+    --primary-color: #4a6bff;
+    --secondary-color: #ff6b6b;
+    --accent-color: #6bffb8;
+    --dark-color: #2c3e50;
+    --light-color: #f9f9f9;
+    --text-color: #333;
+    --header-gradient: linear-gradient(135deg, var(--primary-color), #8a56ff);
+    --footer-gradient: linear-gradient(135deg, var(--dark-color), #1a2533);
+}
+
+/* Global styles with smooth scrolling and better typography */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-    color: #333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    scroll-behavior: smooth;
 }
 
+/* Modern header with gradient background */
 header {
-    background-color: #333;
-    padding: 10px;
+    background: var(--header-gradient);
+    padding: 15px 0;
     text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
+/* Animated navigation */
 header nav ul {
     list-style-type: none;
+    display: flex;
+    justify-content: center;
 }
 
 header nav ul li {
-    display: inline;
     margin: 0 15px;
+    position: relative;
 }
 
 header nav ul li a {
     color: white;
     text-decoration: none;
     font-size: 18px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
 }
 
+header nav ul li a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Underline animation for nav links */
+header nav ul li a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--accent-color);
+    transition: width 0.3s ease;
+}
+
+header nav ul li a:hover::after {
+    width: 100%;
+}
+
+/* Content area with improved spacing and design */
 .content {
-    margin: 20px;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    animation: fadeIn 0.8s ease-in-out;
 }
 
-footer {
-    text-align: center;
-    margin-top: 50px;
-    padding: 10px;
-    background-color: #333;
+/* Card design for content sections */
+.card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    padding: 25px;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* Button styles */
+.button {
+    display: inline-block;
+    background: var(--primary-color);
     color: white;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.button:hover {
+    background: #3a5bef;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(74, 107, 255, 0.4);
+}
+
+.button.secondary {
+    background: var(--secondary-color);
+}
+
+.button.secondary:hover {
+    background: #ff5252;
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+}
+
+/* Modern footer with gradient */
+footer {
+    background: var(--footer-gradient);
+    color: white;
+    text-align: center;
+    padding: 30px 10px;
+    margin-top: 50px;
+    position: relative;
+}
+
+/* Social media icons for footer */
+.social-icons {
+    margin: 15px 0;
+}
+
+.social-icons a {
+    color: white;
+    font-size: 22px;
+    margin: 0 12px;
+    transition: color 0.3s ease;
+}
+
+.social-icons a:hover {
+    color: var(--accent-color);
+}
+
+/* Hero section styles */
+.hero {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #f5f7fa, #e4e8f0);
+    border-radius: 10px;
+    margin-bottom: 40px;
+}
+
+.hero h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Grid layout system */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin: 30px 0;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark mode toggle */
+.dark-mode {
+    --light-color: #1a1a2e;
+    --text-color: #e6e6e6;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    header nav ul {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    header nav ul li {
+        margin: 10px 0;
+    }
+    
+    .hero h1 {
+        font-size: 32px;
+    }
 }
