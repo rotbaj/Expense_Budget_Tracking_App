@@ -38,6 +38,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core', # Add the core app to the list of installed apps
+    
+    # Third-party libraries
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'drf_yasg',  # API documentation
+    
+    # Custom apps
+    'accounts',
+    'expenses',
+    'incomes',
+    'budgets',
+    'reports',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +67,7 @@ ROOT_URLCONF = 'expense_tracker.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'core/templates'], # Add the templates directory to the list of directories
+        'DIRS': [BASE_DIR / 'templates'], # Add the templates directory to the list of directories
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -67,6 +79,15 @@ TEMPLATES = [
         },
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
 
 WSGI_APPLICATION = 'expense_tracker.wsgi.application'
 
