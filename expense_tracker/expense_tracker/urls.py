@@ -16,10 +16,33 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.urls import path, include
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Expense Tracker API",
+        default_version='v1',
+        description="API for tracking personal finances",
+    ),
+    public=True,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # API Documentation
+    path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-ui'),
+    
+    # Authentication
     path('api/auth/', include('accounts.urls')),
-    path('api/', include('expenses.urls')),
-    path('api/', include('incomes.urls')),
+    
+    # Apps
+    path('api/expenses/', include('expenses.urls')),
+    path('api/incomes/', include('incomes.urls')),
+    path('api/budgets/', include('budgets.urls')),
+    path('api/reports/', include('reports.urls')),
+    
+    # Frontend
+    path('', include('frontend.urls')),
 ]
