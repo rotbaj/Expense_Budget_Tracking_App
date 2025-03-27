@@ -1,7 +1,7 @@
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
 from .models import Expense, Category
-from django.views.generic import ListView, CreateView, DetailView
+from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from .serializers import ExpenseSerializer, CategorySerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from django.urls import reverse_lazy
@@ -59,6 +59,18 @@ class ExpenseCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()  # Add categories to the context
         return context
+
+class ExpenseEditView(UpdateView):
+    model = Expense
+    fields = ['amount', 'category', 'description', 'date']
+    template_name = 'expenses/form.html'
+    
+    def form_valid(self, form):
+        # Any additional logic can be added here
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('expense_detail', kwargs={'pk': self.object.pk})  
     
 class ExpenseDetailView(DetailView):
     model = Expense
