@@ -37,7 +37,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core', # Add the core app to the list of installed apps
+    'django.contrib.humanize', 
+    
+    # Third-party libraries
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'drf_yasg',  # API documentation
+    
+    # Custom apps
+    'accounts',
+    'expenses',
+    'incomes',
+    'budgets',
+    'reports',
+    'frontend',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +68,7 @@ ROOT_URLCONF = 'expense_tracker.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'core/templates'], # Add the templates directory to the list of directories
+        'DIRS': [BASE_DIR / 'frontend' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -67,6 +80,15 @@ TEMPLATES = [
         },
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
 
 WSGI_APPLICATION = 'expense_tracker.wsgi.application'
 
@@ -116,10 +138,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'core/static', # Add the static directory to the list of directories
+    BASE_DIR / 'frontend/templates/static', # Add the static directory to the list of directories
 ]
 
 # Default primary key field type

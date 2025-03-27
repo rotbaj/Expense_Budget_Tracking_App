@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Budgets{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-piggy-bank"></i> Budgets</h1>
+        <a href="{% url 'budget_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create Budget
+        </a>
+    </div>
+
+    <!-- Budgets Cards -->
+    <div class="row">
+        {% for budget in budgets %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <span class="badge" style="background-color: {{ budget.category.color }};">
+                            {{ budget.category.name }}
+                        </span>
+                    </h5>
+                    <div>
+                        <span class="badge bg-{% if budget.is_active %}success{% else %}secondary{% endif %}">
+                            {% if budget.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="card-subtitle mb-2 text-muted">{{ budget.get_period_display }} Budget</h6>
+                        <p class="card-text">
+                            <strong>Period:</strong> {{ budget.start_date }} to 
+                            {% if budget.end_date %}{{ budget.end_date }}{% else %}Present{% endif %}
+                        </p>
+                    </div>
+                    
+                    <div class="progress mb-3" style="height: 20px;">
+                        <div class="progress-bar 
+                            {% if budget.progress_percentage > 100 %}bg-danger
+                            {% elif budget.progress_percentage > 80 %}bg-warning
+                            {% else %}bg-success{% endif %}" 
+                            role="progressbar" 
+                            style="width: {{ budget.progress_percentage }}%;"
+                            aria-valuenow="{{ budget.progress_percentage }}" 
+                            aria-valuemin="0" 
+                            aria-valuemax="100">
+                            {{ budget.progress_percentage|floatformat:0 }}%
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body p-2 text-center">
+                                    <small class="text-muted">Budget</small>
+                                    <h6 class="mb-0">${{ budget.amount|intcomma }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body p-2 text-center">
+                                    <small class="text-muted">Spent</small>
+                                    <h6 class="mb-0">${{ budget.spent_amount|intcomma }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body p-2 text-center">
+                                    <small class="text-muted">Remaining</small>
+                                    <h6 class="mb-0">${{ budget.remaining_amount|intcomma }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-end">
+                        <a href="{% url 'budget_detail' budget.id %}" class="btn btn-sm btn-outline-primary me-2">
+                            <i class="bi bi-eye"></i> View
+                        </a>
+                        <a href="{% url 'budget_edit' budget.id %}" class="btn btn-sm btn-outline-warning me-2">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                        <a href="{% url 'budget_delete' budget.id %}" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i> Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">No budgets created yet</h5>
+                    <p class="card-text">Create your first budget to start tracking your spending limits</p>
+                    <a href="{% url 'budget_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Create Budget
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Expense Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-cash-stack"></i> Expense Details</h1>
+        <div>
+            <a href="{% url 'expense_edit' expense.id %}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <a href="{% url 'expense_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="card-title">Basic Information</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>Date:</strong> {{ expense.date }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Category:</strong> 
+                            <span class="badge" style="background-color: {{ expense.category.color }};">
+                                {{ expense.category.name }}
+                            </span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Amount:</strong> 
+                            <span class="text-danger">-${{ expense.amount|intcomma }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="card-title">Additional Details</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>Description:</strong> 
+                            <p>{{ expense.description|default:"No description" }}</p>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Created:</strong> {{ expense.created_at|date:"M d, Y H:i" }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Last Updated:</strong> {{ expense.updated_at|date:"M d, Y H:i" }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-end">
+        <a href="{% url 'expense_delete' expense.id %}" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Delete Expense
+        </a>
+    </div>
+</div>
+{% endblock %}
