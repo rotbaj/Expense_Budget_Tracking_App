@@ -1,127 +1,231 @@
 {% extends 'base.html' %}
+{% load customfilters %}
+{% load humanize %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Financial Dashboard{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8">
-        <h2>Welcome, {{ user.username }}!</h2>
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5>Recent Expenses</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Category</th>
-                                <th>Amount</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for expense in recent_expenses %}
-                            <tr>
-                                <td>{{ expense.date }}</td>
-                                <td>{{ expense.category }}</td>
-                                <td>${{ expense.amount }}</td>
-                                <td>{{ expense.description|truncatechars:30 }}</td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center">No expenses yet</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-graph-up"></i> Financial Dashboard</h1>
+        <div class="btn-group">
+            <button class="btn btn-outline-secondary" id="refresh-dashboard">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-success">
+                        <i class="bi bi-currency-dollar"></i> Income
+                    </h5>
+                    <h2 class="mb-0">${{ income_expense.income|floatformat:2|intcomma }}</h2>
+                    <small class="text-muted">This Month ({{ current_month }})</small>
                 </div>
-                <a href="{% url 'expense_list' %}" class="btn btn-primary mt-3">View All Expenses</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-danger">
+                        <i class="bi bi-cash-stack"></i> Expenses
+                    </h5>
+                    <h2 class="mb-0">${{ income_expense.expense|floatformat:2|intcomma }}</h2>
+                    <small class="text-muted">This Month ({{ current_month }})</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">
+                        <i class="bi bi-piggy-bank"></i> Balance
+                    </h5>
+                    <h2 class="mb-0 {% if income_expense.income|default:0 > income_expense.expense|default:0 %}text-success{% else %}text-danger{% endif %}">
+                        ${{ income_expense.income|subtract:income_expense.expense|floatformat:2|intcomma }}
+                    </h2>
+                    <small class="text-muted">This Month ({{ current_month }})</small>
+                </div>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h5>Summary</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="summaryChart" width="100%" height="200"></canvas>
-                <div class="mt-3">
-                    <p><strong>Total Spent This Month:</strong> ${{ monthly_total }}</p>
-                    <p><strong>Budget Remaining:</strong> 
-                        {% if budget_remaining == "No Budget Set" %}
-                            <span class="text-danger">{{ budget_remaining }}</span>
-                        {% else %}
-                            ${{ budget_remaining }}
-                        {% endif %}
-                    </p>
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- Spending by Category -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-tags"></i> Top Spending Categories
+                    </h5>
+                    <small class="text-white-50">{{ last_30_days }}</small>
+                </div>
+                <div class="card-body">
+                    {% if category_spending %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in category_spending %}
+                                <tr>
+                                    <td>{{ item.category }}</td>
+                                    <td class="text-end">${{ item.total|floatformat:2|intcomma }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-info-circle fs-1 text-muted"></i>
+                        <p class="mt-2">No spending data available for the last 30 days</p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5>Quick Actions</h5>
-            </div>
-            <div class="card-body">
-                <a href="{% url 'expense_create' %}" class="btn btn-success w-100 mb-2">
-                    <i class="bi bi-plus-circle"></i> Add Expense
-                </a>
-                <a href="{% url 'budget_create' %}" class="btn btn-primary w-100">
-                    <i class="bi bi-wallet2"></i> Create Budget
-                </a>
+
+        <!-- Budget Progress -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clipboard2-check"></i> Budget Progress
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if budget_progress %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Progress</th>
+                                    <th class="text-end">Spent</th>
+                                    <th class="text-end">Remaining</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for budget in budget_progress %}
+                                <tr>
+                                    <td>{{ budget.category }}</td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar {% if budget.is_over %}bg-danger{% else %}bg-success{% endif %}" 
+                                                 role="progressbar" 
+                                                 style="width: {{ budget.progress }}%" 
+                                                 aria-valuenow="{{ budget.progress }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                                {{ budget.progress }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-end">${{ budget.spent|floatformat:2|intcomma }}</td>
+                                    <td class="text-end {% if budget.is_over %}text-danger{% else %}text-success{% endif %}">
+                                        ${{ budget.remaining|floatformat:2|intcomma }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-info-circle fs-1 text-muted"></i>
+                        <p class="mt-2">No active budgets found</p>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- 🔹 Reports Section -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5>Reports</h5>
-            </div>
-            <div class="card-body">
-                <a href="{% url 'report_dashboard' %}" class="btn btn-info w-100 mb-2">
-                    <i class="bi bi-graph-up"></i> Dashboard Report
-                </a>
-                <a href="{% url 'spending-by-category' %}" class="btn btn-warning w-100 mb-2">
-                    <i class="bi bi-pie-chart"></i> Spending by Category
-                </a>
-                <a href="{% url 'income-vs-expense' %}" class="btn btn-danger w-100 mb-2">
-                    <i class="bi bi-cash-coin"></i> Income vs Expense
-                </a>
-                <a href="{% url 'budget-progress' %}" class="btn btn-success w-100">
-                    <i class="bi bi-bar-chart"></i> Budget Progress
-                </a>
+    <!-- Recent Reports -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-text"></i> Recent Reports
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_reports %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Report Name</th>
+                                    <th>Type</th>
+                                    <th>Last Updated</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for report in recent_reports %}
+                                <tr>
+                                    <td>{{ report.name }}</td>
+                                    <td>{{ report.get_report_type_display }}</td>
+                                    <td>{{ report.updated_at|naturaltime }}</td>
+                                    <td class="text-end">
+                                        <a href="#" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> View
+                                        </a>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-info-circle fs-1 text-muted"></i>
+                        <p class="mt-2">No recent reports found</p>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-{# Ensure Chart.js is loaded #}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('summaryChart').getContext('2d');
-    const chart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: {{ categories|safe }},
-            datasets: [{
-                data: {{ amounts|safe }},
-                backgroundColor: [
-                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
-                    '#9966FF', '#FF9F40', '#8AC24A', '#F06292'
-                ],
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-        }
+    // Refresh button functionality
+    document.getElementById('refresh-dashboard').addEventListener('click', function() {
+        window.location.reload();
     });
+    
+    // Auto-refresh every 5 minutes
+    setInterval(function() {
+        window.location.reload();
+    }, 300000);
 });
 </script>
+
+<style>
+    .card {
+        border-radius: 0.5rem;
+    }
+    .progress {
+        background-color: #e9ecef;
+    }
+    .table th {
+        border-top: none;
+    }
+</style>
 {% endblock %}

@@ -1,20 +1,14 @@
 from django.urls import path, include
+from .views import ReportDashboardView, ReportPresetViewSet, SpendingByCategoryReport, IncomeVsExpenseReport, BudgetProgressReport
 from rest_framework.routers import DefaultRouter
-from .views import (
-    ReportPresetViewSet,
-    ReportDashboardView,
-    SpendingByCategoryReport,
-    IncomeVsExpenseReport,
-    BudgetProgressReport
-)
 
 router = DefaultRouter()
-router.register(r'presets', ReportPresetViewSet, basename='reportpreset')
+router.register(r'presets', ReportPresetViewSet, basename='report-preset')
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('dashboard/', ReportDashboardView.as_view(), name='report_dashboard'), 
-    path('spending-by-category/', SpendingByCategoryReport.as_view(), name='spending-by-category'),
-    path('income-vs-expense/', IncomeVsExpenseReport.as_view(), name='income-vs-expense'),
-    path('budget-progress/', BudgetProgressReport.as_view(), name='budget-progress'),
+    path('dashboard/', ReportDashboardView.as_view(), name='report_dashboard'),
+    path('api/spending-by-category/', SpendingByCategoryReport.as_view(), name='spending-by-category'),
+    path('api/income-vs-expense/', IncomeVsExpenseReport.as_view(), name='income-vs-expense'),
+    path('api/budget-progress/', BudgetProgressReport.as_view(), name='budget-progress'),
+    path('api/', include(router.urls)),
 ]
