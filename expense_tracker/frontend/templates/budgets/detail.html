@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Budget Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-wallet2"></i> Budget Details</h1>
+        <div>
+            <a href="{% url 'budget_create' %}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <a href="{% url 'budget_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="card-title">Basic Information</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>Start Date:</strong> {{ budget.start_date }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>End Date:</strong> {{ budget.end_date }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Category:</strong> {{ budget.category }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Amount:</strong> ${{ budget.amount|intcomma }}
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="card-title">Additional Details</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>Description:</strong> 
+                            <p>{{ budget.description|default:"No description" }}</p>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Created:</strong> {{ budget.created_at|date:"M d, Y H:i" }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Last Updated:</strong> {{ budget.updated_at|date:"M d, Y H:i" }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-end">
+        <a href="{% url 'budget_delete' budget.id %}" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Delete Budget
+        </a>
+    </div>
+</div>
+{% endblock %}

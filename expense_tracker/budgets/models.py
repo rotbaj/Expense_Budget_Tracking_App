@@ -1,35 +1,37 @@
 from django.db import models
 from django.contrib.auth.models import User
-from expenses.models import Category
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 class Budget(models.Model):
-    PERIOD_CHOICES = [
-        ('DAILY', 'Daily'),
-        ('WEEKLY', 'Weekly'),
-        ('MONTHLY', 'Monthly'),
-        ('QUARTERLY', 'Quarterly'),
-        ('YEARLY', 'Yearly'),
-        ('CUSTOM', 'Custom'),
+    BUDGET_CATEGORIES = [
+        ('FOOD', 'Food'),
+        ('TRANSPORT', 'Transport'),
+        ('ENTERTAINMENT', 'Entertainment'),
+        ('UTILITIES', 'Utilities'),
+        ('OTHERS', 'Others'),
     ]
-    
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    period = models.CharField(max_length=10, choices=PERIOD_CHOICES, default='MONTHLY')
-    start_date = models.DateField()
-    end_date = models.DateField(null=True, blank=True)
-    is_active = models.BooleanField(default=True)
+    category = models.CharField(max_length=20, choices=BUDGET_CATEGORIES, default='FOOD')
+    start_date = models.DateField(default=timezone.now)
+    end_date = models.DateField()
+    description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-start_date']
-        unique_together = ['user', 'category', 'period', 'start_date']
-
+        verbose_name_plural = 'Budgets'
+    
     def __str__(self):
-        return f"{self.user.username} - {self.category.name} - ${self.amount}/{self.period.lower()}"
-
+        return f"{self.get_category_display()} Budget (${self.amount}) for {self.user.username}"
+    
     def clean(self):
-        if self.end_date and self.start_date > self.end_date:
-            raise ValidationError("End date must be after start date")
+        if self.end_date < self.start_date:
+            raise ValidationError("End date cannot be before start date.")
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Runs validation before saving
+        super().save(*args, **kwargs)
