@@ -1,10 +1,11 @@
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
 from .models import Expense, Category
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, DetailView
 from .serializers import ExpenseSerializer, CategorySerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 class ExpenseViewSet(viewsets.ModelViewSet):
     serializer_class = ExpenseSerializer
@@ -22,8 +23,15 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
 class ExpenseListView(ListView):
     model = Expense
-    template_name = 'expenses/list.html'  
+    template_name = 'expenses/list.html'
     context_object_name = 'expenses'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Example of passing the reverse URL for the detail view for each expense
+        for expense in context['expenses']:
+            expense.detail_url = reverse_lazy('expense_detail', kwargs={'pk': expense.pk})
+        return context
 
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
@@ -34,8 +42,25 @@ class CategoryViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save()
 
-class ExpenseCreateView(CreateView):
+class ExpenseCreateView(LoginRequiredMixin, CreateView):
     model = Expense
-    template_name = "expenses/form.html"
-    fields = ['user', 'amount', 'category', 'description', 'date'] 
-    success_url = reverse_lazy('expense_list') 
+    template_name = 'expenses/form.html'
+    fields = ['amount', 'category', 'description', 'date']
+    
+    # Automatically set the logged-in user for the expense
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('expense_list')  # Replace with your URL for expense list page
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()  # Add categories to the context
+        return context
+    
+class ExpenseDetailView(DetailView):
+    model = Expense
+    template_name = 'expenses/detail.html'
+    context_object_name = 'expense'
