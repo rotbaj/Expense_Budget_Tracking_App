@@ -1,5 +1,6 @@
+from django.shortcuts import render
 from rest_framework import viewsets, generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from .models import ReportPreset
 from .serializers import ReportPresetSerializer
@@ -8,6 +9,12 @@ from incomes.models import Income
 from budgets.models import Budget
 from django.db.models import Sum
 from datetime import date, timedelta
+from django.views import View
+
+
+class ReportDashboardView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'reports/dashboard.html') 
 
 class ReportPresetViewSet(viewsets.ModelViewSet):
     serializer_class = ReportPresetSerializer

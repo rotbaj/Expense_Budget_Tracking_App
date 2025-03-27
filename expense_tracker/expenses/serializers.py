@@ -7,6 +7,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description']
 
 class ExpenseSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())  # Auto-assigns the logged-in user
     category = CategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(),

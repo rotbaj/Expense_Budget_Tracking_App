@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Expense, Category
+from django.db.models import Count
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -7,6 +8,10 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ('name', 'description')
     list_per_page = 20
     
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(expense_count=Count("expense"))
+
     def expense_count(self, obj):
         return obj.expense_set.count()
     expense_count.short_description = '# Expenses'

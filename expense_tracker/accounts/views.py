@@ -1,3 +1,5 @@
+from django.shortcuts import render
+from django.views import View
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -19,3 +21,7 @@ class RegisterUserView(generics.CreateAPIView):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+class ProfileView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'accounts/profile.html') 

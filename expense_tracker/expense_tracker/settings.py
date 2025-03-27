@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize', 
     
     # Third-party libraries
     'rest_framework',
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     'incomes',
     'budgets',
     'reports',
+    'frontend',
 ]
 
 MIDDLEWARE = [
@@ -66,7 +68,7 @@ ROOT_URLCONF = 'expense_tracker.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'], # Add the templates directory to the list of directories
+        'DIRS': [BASE_DIR / 'frontend' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -139,7 +141,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'static', # Add the static directory to the list of directories
+    BASE_DIR / 'frontend/templates/static', # Add the static directory to the list of directories
 ]
 
 # Default primary key field type

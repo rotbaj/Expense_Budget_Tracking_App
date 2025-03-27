@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Income vs Expense{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-arrow-left-right"></i> Income vs Expense</h1>
+        <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="timeRangeDropdown" data-bs-toggle="dropdown">
+                <i class="bi bi-calendar"></i> {{ time_range|title }}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="?range=week">Week</a></li>
+                <li><a class="dropdown-item" href="?range=month">Month</a></li>
+                <li><a class="dropdown-item" href="?range=year">Year</a></li>
+                <li><a class="dropdown-item" href="?range=all">All Time</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5><i class="bi bi-bar-chart"></i> Monthly Comparison</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="comparisonChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5><i class="bi bi-info-circle"></i> Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Total Income</h6>
+                        <h3 class="text-success">${{ total_income|intcomma }}</h3>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Total Expenses</h6>
+                        <h3 class="text-danger">${{ total_expenses|intcomma }}</h3>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Net Balance</h6>
+                        <h3 class="{% if net_balance >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            ${{ net_balance|intcomma }}
+                        </h3>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ income_percentage }}%;" 
+                             aria-valuenow="{{ income_percentage }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
+                        <div class="progress-bar bg-danger" role="progressbar" 
+                             style="width: {{ expense_percentage }}%;" 
+                             aria-valuenow="{{ expense_percentage }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                    <small class="text-muted">
+                        {{ income_percentage|floatformat:0 }}% Income vs {{ expense_percentage|floatformat:0 }}% Expenses
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5><i class="bi bi-calendar-month"></i> Monthly Breakdown</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th class="text-end">Income</th>
+                            <th class="text-end">Expenses</th>
+                            <th class="text-end">Balance</th>
+                            <th class="text-end">Savings Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for month in monthly_data %}
+                        <tr>
+                            <td>{{ month.month|date:"F Y" }}</td>
+                            <td class="text-end text-success">${{ month.income|intcomma }}</td>
+                            <td class="text-end text-danger">${{ month.expenses|intcomma }}</td>
+                            <td class="text-end {% if month.balance >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                ${{ month.balance|intcomma }}
+                            </td>
+                            <td class="text-end {% if month.savings_rate >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ month.savings_rate|floatformat:1 }}%
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Comparison Chart
+    const ctx = document.getElementById('comparisonChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ monthly_labels|safe }},
+            datasets: [
+                {
+                    label: 'Income',
+                    data: {{ monthly_income|safe }},
+                    backgroundColor: '#28a745',
+                    borderColor: '#28a745',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Expenses',
+                    data: {{ monthly_expenses|safe }},
+                    backgroundColor: '#dc3545',
+                    borderColor: '#dc3545',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            let value = context.raw || 0;
+                            return `${label}: $${value.toLocaleString()}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

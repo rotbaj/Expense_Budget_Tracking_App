@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Spending by Category{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-tags"></i> Spending by Category</h1>
+        <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="timeRangeDropdown" data-bs-toggle="dropdown">
+                <i class="bi bi-calendar"></i> {{ time_range|title }}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="?range=week">Week</a></li>
+                <li><a class="dropdown-item" href="?range=month">Month</a></li>
+                <li><a class="dropdown-item" href="?range=year">Year</a></li>
+                <li><a class="dropdown-item" href="?range=all">All Time</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5><i class="bi bi-pie-chart"></i> Category Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5><i class="bi bi-table"></i> Category Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-end">Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in category_data %}
+                                <tr>
+                                    <td>
+                                        <span class="badge" style="background-color: {{ item.color }};">
+                                            {{ item.name }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">${{ item.amount|intcomma }}</td>
+                                    <td class="text-end">{{ item.percentage }}%</td>
+                                </tr>
+                                {% endfor %}
+                                <tr class="table-active">
+                                    <td><strong>Total</strong></td>
+                                    <td class="text-end"><strong>${{ total_amount|intcomma }}</strong></td>
+                                    <td class="text-end"><strong>100%</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Category Chart
+    const ctx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ category_labels|safe }},
+            datasets: [{
+                data: {{ category_values|safe }},
+                backgroundColor: {{ category_colors|safe }},
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            let value = context.raw || 0;
+                            let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            let percentage = Math.round((value / total) * 100);
+                            return `${label}: $${value.toLocaleString()} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
