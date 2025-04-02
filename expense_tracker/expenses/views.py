@@ -20,7 +20,7 @@ class ExpenseListView(ListView):
     def get_queryset(self):
         queryset = Expense.objects.filter(user=self.request.user)
 
-        # Apply budget filter if provided
+        # Apply budget filter
         budget_id = self.request.GET.get('budget')
         if budget_id:
             queryset = queryset.filter(budget__id=budget_id)
@@ -84,7 +84,7 @@ class ExpenseCreateView(LoginRequiredMixin, CreateView):
         return context
 
     def get_form_kwargs(self):
-        # Ensure the user is passed to the form
+        # Ensures the user is passed to the form
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
@@ -96,7 +96,6 @@ class ExpenseEditView(UpdateView):
     template_name = 'expenses/form.html'
     
     def form_valid(self, form):
-        # Any additional logic can be added here
         return super().form_valid(form)
     
     def get_success_url(self):
