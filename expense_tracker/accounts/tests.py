@@ -46,7 +46,7 @@ class UserModelTests(TestCase):
     def test_email_unique(self):
         """Test email uniqueness"""
         User.objects.create_user(**self.user_data)
-        with self.assertRaises(Exception):  # IntegrityError
+        with self.assertRaises(Exception): 
             User.objects.create_user(
                 username='testuser2',
                 email='test@example.com',

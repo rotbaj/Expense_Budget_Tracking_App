@@ -8,14 +8,14 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description']
 
 class ExpenseSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())  # Auto-assigns the logged-in user
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     category = CategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(),
         source='category',
         write_only=True
     )
-    budget = serializers.PrimaryKeyRelatedField(  # Add this field
+    budget = serializers.PrimaryKeyRelatedField(
         queryset=Budget.objects.all(),
         required=False,
         allow_null=True

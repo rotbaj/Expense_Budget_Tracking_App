@@ -23,7 +23,7 @@
                     <h5 class="card-title text-success">
                         <i class="bi bi-currency-dollar"></i> Income
                     </h5>
-                    <h2 class="mb-0">${{ income_expense.income|floatformat:2|intcomma }}</h2>
+                    <h2 class="mb-0">${{ income_expense.income|default:0|floatformat:2|intcomma }}</h2>
                     <small class="text-muted">This Month ({{ current_month }})</small>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                     <h5 class="card-title text-danger">
                         <i class="bi bi-cash-stack"></i> Expenses
                     </h5>
-                    <h2 class="mb-0">${{ income_expense.expense|floatformat:2|intcomma }}</h2>
+                    <h2 class="mb-0">${{ income_expense.expense|default:0|floatformat:2|intcomma }}</h2>
                     <small class="text-muted">This Month ({{ current_month }})</small>
                 </div>
             </div>
@@ -46,7 +46,7 @@
                         <i class="bi bi-piggy-bank"></i> Balance
                     </h5>
                     <h2 class="mb-0 {% if income_expense.income|default:0 > income_expense.expense|default:0 %}text-success{% else %}text-danger{% endif %}">
-                        ${{ income_expense.income|subtract:income_expense.expense|floatformat:2|intcomma }}
+                        ${{ income_expense.income|default:0|subtract:income_expense.expense|floatformat:2|intcomma }}
                     </h2>
                     <small class="text-muted">This Month ({{ current_month }})</small>
                 </div>

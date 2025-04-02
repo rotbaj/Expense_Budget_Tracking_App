@@ -37,11 +37,11 @@ class IncomeCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('income_list')  # Replace with your URL for income list page
+        return reverse_lazy('income_list')  
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['categories'] = Income.INCOME_CATEGORIES  # Add income categories to the context
+        context['categories'] = Income.INCOME_CATEGORIES 
         return context
 
 class IncomeDetailView(DetailView):

@@ -13,5 +13,5 @@ class ExpenseForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if user:
-            # Filter budgets to only show relevant ones for the user (no filtering by category here)
+            # Filter budgets to only show relevant ones for the user 
             self.fields['budget'].queryset = Budget.objects.filter(user=user)
