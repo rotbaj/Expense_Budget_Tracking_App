@@ -18,7 +18,7 @@ This Django-based web application helps users manage their personal finances by 
 
 ### Advanced Features
 - Budget progress tracking with visual indicators
-- Spending analysis by category/time period
+- Spending analysis by time period
 - Income vs. expense comparisons
 - Custom report presets
 - Responsive web interface
