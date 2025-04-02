@@ -5,6 +5,7 @@ from budgets.models import Budget
 class Category(models.Model):
     EXPENSE_CATEGORIES = [
         ('RENT', 'Rent'),
+        ('FOOD', 'Food'),
         ('GROCERIES', 'Groceries'),
         ('TRANSPORTATION', 'Transportation'),
         ('UTILITIES', 'Utilities'),

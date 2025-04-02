@@ -6,11 +6,18 @@ from django.db.models import Sum
 
 class Budget(models.Model):
     BUDGET_CATEGORIES = [
+        ('RENT', 'Rent'),
         ('FOOD', 'Food'),
-        ('TRANSPORT', 'Transport'),
-        ('ENTERTAINMENT', 'Entertainment'),
+        ('GROCERIES', 'Groceries'),
+        ('TRANSPORTATION', 'Transportation'),
         ('UTILITIES', 'Utilities'),
-        ('OTHERS', 'Others'),
+        ('ENTERTAINMENT', 'Entertainment'),
+        ('HEALTHCARE', 'Healthcare'),
+        ('DEBT', 'Debt Repayment'),
+        ('SAVINGS', 'Savings & Investments'),
+        ('EDUCATION', 'Education'),
+        ('OTHER', 'Other'),
+        ('RENT', 'Rent'),
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -21,6 +28,7 @@ class Budget(models.Model):
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['-start_date']

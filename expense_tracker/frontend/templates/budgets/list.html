@@ -79,6 +79,15 @@
                         </div>
                     </div>
                 </div>
+                <td>
+                    <a href="{% url 'toggle_budget_status' budget.id %}">
+                        {% if budget.is_active %}
+                            <button class="btn btn-success">Active</button>
+                        {% else %}
+                            <button class="btn btn-danger">Inactive</button>
+                        {% endif %}
+                    </a>
+                </td>
                 <div class="card-footer bg-transparent">
                     <div class="d-flex justify-content-end">
                         <a href="{% url 'budget_detail' budget.id %}" class="btn btn-sm btn-outline-primary me-2">

@@ -54,12 +54,18 @@ class ExpenseCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('expense_list')  # Replace with your URL for expense list page
+        return reverse_lazy('expense_list') 
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()  # Add categories to the context
         return context
+
+    def get_form_kwargs(self):
+        # Ensure the user is passed to the form
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
 class ExpenseEditView(UpdateView):
     model = Expense

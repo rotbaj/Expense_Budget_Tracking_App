@@ -6,6 +6,9 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from .models import Budget
 from .serializers import BudgetSerializer
@@ -72,7 +75,6 @@ class BudgetCreateView(LoginRequiredMixin, CreateView):
         form.fields['end_date'].widget.attrs.update({'class': 'datepicker'})
         return form
 
-
 class BudgetUpdateView(LoginRequiredMixin, UpdateView):
     model = Budget
     fields = ['amount', 'category', 'start_date', 'end_date', 'description']
@@ -99,3 +101,11 @@ class BudgetDetailView(LoginRequiredMixin, DetailView):
         context['remaining_amount'] = self.object.remaining_amount
         context['progress_percentage'] = self.object.progress_percentage
         return context
+
+@login_required
+def toggle_budget_status(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id, user=request.user)
+    budget.is_active = not budget.is_active
+    budget.save()
+    messages.success(request, f"Budget '{budget.category}' is now {'Active' if budget.is_active else 'Inactive'}.")
+    return redirect('budget_list')  # Change to your actual budget list view name
