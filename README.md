@@ -4,7 +4,7 @@
 [![DRF](https://img.shields.io/badge/DRF-3.12-blue.svg)](https://www.django-rest-framework.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A full-featured personal finance application built with Django and Django REST Framework that helps users track expenses, manage budgets, and generate financial reports.
+This Django-based web application helps users manage their personal finances by tracking expenses and budgets. It provides a user-friendly interface to record income, categorize spending, and set up budgets to monitor financial health.
 
 
 ## Features ✨
