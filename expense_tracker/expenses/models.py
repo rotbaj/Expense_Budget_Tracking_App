@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 
 class Category(models.Model):
     EXPENSE_CATEGORIES = [
@@ -22,7 +22,7 @@ class Category(models.Model):
         return self.get_name_display()
 
 class Expense(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.CharField(max_length=20, choices=Category.EXPENSE_CATEGORIES)
     description = models.TextField(blank=True, null=True)

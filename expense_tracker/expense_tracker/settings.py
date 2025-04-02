@@ -14,6 +14,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+AUTH_USER_MODEL = 'accounts.User'
 
 
 # Quick-start development settings - unsuitable for production
@@ -24,13 +25,25 @@ SECRET_KEY = 'django-insecure--o85hl4kv!0)@va3xz66lh77a^ixzc$#-q%oe-f)bb#m+!osu3
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    
 ALLOWED_HOSTS = []
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    # Custom apps
+    'accounts',
+    'expenses',
+    'incomes',
+    'budgets',
+    'reports',
+    'frontend',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,15 +55,7 @@ INSTALLED_APPS = [
     # Third-party libraries
     'rest_framework',
     'rest_framework_simplejwt',
-    'drf_yasg',  # API documentation
-    
-    # Custom apps
-    'accounts',
-    'expenses',
-    'incomes',
-    'budgets',
-    'reports',
-    'frontend',
+    'drf_yasg',  # API documentatio
 ]
 
 MIDDLEWARE = [
@@ -89,6 +94,18 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
 }
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
+
+LOGIN_URL = 'rest_framework:login'
+LOGOUT_URL = 'rest_framework:logout'
 
 WSGI_APPLICATION = 'expense_tracker.wsgi.application'
 

@@ -1,7 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.conf import settings
 
 class Budget(models.Model):
     BUDGET_CATEGORIES = [
@@ -12,7 +12,7 @@ class Budget(models.Model):
         ('OTHERS', 'Others'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.CharField(max_length=20, choices=BUDGET_CATEGORIES, default='FOOD')
     start_date = models.DateField(default=timezone.now)

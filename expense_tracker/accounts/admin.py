@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
-from .models import UserProfile
+from .models import User, UserProfile
+
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
@@ -10,26 +10,33 @@ class UserProfileInline(admin.StackedInline):
     fk_name = 'user'
     fields = ('currency', 'monthly_budget', 'profile_picture')
 
+
 class CustomUserAdmin(UserAdmin):
     inlines = (UserProfileInline,)
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'get_currency', 'get_monthly_budget')
-    list_select_related = ('userprofile',)
-    
+    list_display = (
+        'username', 
+        'email', 
+        'first_name', 
+        'last_name', 
+        'is_staff', 
+        'get_currency',
+        'get_monthly_budget'
+    )
+    list_select_related = ('profile',)
+
     def get_currency(self, instance):
-        return instance.userprofile.currency
+        return instance.profile.currency
     get_currency.short_description = 'Currency'
-    
+
     def get_monthly_budget(self, instance):
-        return instance.userprofile.monthly_budget
+        return instance.profile.monthly_budget
     get_monthly_budget.short_description = 'Monthly Budget'
-    
+
     def get_inline_instances(self, request, obj=None):
         if not obj:
             return list()
         return super().get_inline_instances(request, obj)
 
-admin.site.unregister(User)
-admin.site.register(User, CustomUserAdmin)
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
@@ -37,7 +44,7 @@ class UserProfileAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'user__email')
     raw_id_fields = ('user',)
     list_per_page = 20
-    
+
     fieldsets = (
         ('User', {
             'fields': ('user',)
@@ -50,3 +57,7 @@ class UserProfileAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+# Register the custom User model
+admin.site.register(User, CustomUserAdmin)
