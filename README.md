@@ -62,7 +62,7 @@ This Django-based web application helps users manage their personal finances by 
 3.  **Install dependencies:**
 
     ```bash
-    pip install -r requirements.txt  # You'll need to create this file
+    pip install -r requirements.txt  
     ```
 
 4.  **Apply migrations:**
