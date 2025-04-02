@@ -123,37 +123,26 @@ class ReportDashboardView(View):
     permission_classes = [IsAuthenticated]
     
     def get(self, request, *args, **kwargs):
-        # Get default report data
         today = timezone.now().date()
-        
-        # 1. Spending by Category (last 30 days)
-        category_spending = Expense.objects.filter(
-            user=request.user,
-            date__gte=today - timedelta(days=30)
-        ).values('category').annotate(
-            total=Sum('amount')
-        ).order_by('-total')[:5]
-        
-        # 2. Income vs Expense (current month)
+
+        # 1. Income vs Expense
         current_month_start = today.replace(day=1)
         income_expense_data = {
             'income': Income.objects.filter(
-                user=request.user,
-                date__gte=current_month_start
+                user=request.user, date__gte=current_month_start
             ).aggregate(total=Sum('amount'))['total'] or 0,
             'expense': Expense.objects.filter(
-                user=request.user,
-                date__gte=current_month_start
+                user=request.user, date__gte=current_month_start
             ).aggregate(total=Sum('amount'))['total'] or 0,
         }
-        
-        # 3. Budget Progress (active budgets)
+
+        # 2. Budget Progress
         active_budgets = Budget.objects.filter(
             Q(user=request.user) &
             Q(start_date__lte=today) &
             (Q(end_date__gte=today) | Q(end_date__isnull=True))
         )
-        
+
         budget_progress = []
         for budget in active_budgets:
             spent = Expense.objects.filter(
@@ -162,9 +151,9 @@ class ReportDashboardView(View):
                 date__gte=budget.start_date,
                 date__lte=budget.end_date if budget.end_date else today
             ).aggregate(total=Sum('amount'))['total'] or 0
-            
+
             progress = (spent / budget.amount) * 100 if budget.amount > 0 else 0
-            
+
             budget_progress.append({
                 'category': budget.get_category_display(),
                 'budget': budget.amount,
@@ -173,19 +162,17 @@ class ReportDashboardView(View):
                 'progress': round(progress, 1),
                 'is_over': spent > budget.amount
             })
-        
-        # 4. Recent reports
+
+        # 3. Recent Reports
         recent_reports = ReportPreset.objects.filter(
             user=request.user
         ).order_by('-updated_at')[:3]
-        
+
         context = {
-            'category_spending': category_spending,
             'income_expense': income_expense_data,
-            'budget_progress': budget_progress,
+            'budget_progress': budget_progress,  # Ensure this updates
             'recent_reports': recent_reports,
             'current_month': current_month_start.strftime('%B %Y'),
-            'last_30_days': (today - timedelta(days=30)).strftime('%b %d') + " - " + today.strftime('%b %d')
         }
-        
+
         return render(request, 'reports/dashboard.html', context)
