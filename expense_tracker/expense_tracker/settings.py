@@ -104,9 +104,6 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
 }
 
-LOGIN_URL = 'rest_framework:login'
-LOGOUT_URL = 'rest_framework:logout'
-
 WSGI_APPLICATION = 'expense_tracker.wsgi.application'
 
 
