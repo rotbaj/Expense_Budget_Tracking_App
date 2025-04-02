@@ -8,6 +8,37 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import ExpenseForm
 from django.contrib import messages
+from django.db.models import Sum
+from django.shortcuts import get_object_or_404
+from budgets.models import Budget  
+
+class ExpenseListView(ListView):
+    model = Expense
+    template_name = 'expenses/list.html'
+    context_object_name = 'expenses'
+
+    def get_queryset(self):
+        queryset = Expense.objects.filter(user=self.request.user)
+
+        # Apply budget filter if provided
+        budget_id = self.request.GET.get('budget')
+        if budget_id:
+            queryset = queryset.filter(budget__id=budget_id)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        expenses = self.get_queryset()
+
+        # Calculate the total amount of expenses for the selected budget
+        total_amount = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
+        context['total_amount'] = total_amount
+
+        # Pass budgets for filtering dropdown
+        context['budgets'] = Budget.objects.filter(user=self.request.user)
+
+        return context
 
 class ExpenseViewSet(viewsets.ModelViewSet):
     serializer_class = ExpenseSerializer
@@ -22,18 +53,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-class ExpenseListView(ListView):
-    model = Expense
-    template_name = 'expenses/list.html'
-    context_object_name = 'expenses'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Example of passing the reverse URL for the detail view for each expense
-        for expense in context['expenses']:
-            expense.detail_url = reverse_lazy('expense_detail', kwargs={'pk': expense.pk})
-        return context
 
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer

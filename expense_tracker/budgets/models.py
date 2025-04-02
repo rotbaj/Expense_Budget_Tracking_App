@@ -56,3 +56,7 @@ class Budget(models.Model):
     @property
     def progress_percentage(self):
         return (self.spent_amount / self.amount) * 100 if self.amount > 0 else 0
+    
+    @property
+    def update_spent_amount(self):
+        self.save() 

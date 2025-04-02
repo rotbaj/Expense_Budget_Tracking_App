@@ -96,6 +96,8 @@ class BudgetDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        budget = self.get_object()
+        budget.update_spent_amount() 
         context['expenses'] = self.object.expenses.all()
         context['spent_amount'] = budget.spent_amount()
         context['remaining_amount'] = budget.remaining_amount()

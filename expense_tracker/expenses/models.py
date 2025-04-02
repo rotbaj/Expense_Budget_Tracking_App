@@ -46,15 +46,20 @@ class Expense(models.Model):
         budget_info = f" (Budget: {self.budget})" if self.budget else ""
         return f"{self.user.username} - {self.category}{budget_info} - ${self.amount}"
 
-    def save(self, *args, **kwargs):
-        # Auto-assign budget if category matches and date is within budget period
-        if not self.budget and self.category:
-            matching_budget = Budget.objects.filter(
-                user=self.user,
-                category=self.category,
-                start_date__lte=self.date,
-                end_date__gte=self.date
-            ).first()
-            if matching_budget:
-                self.budget = matching_budget
-        super().save(*args, **kwargs)
+def save(self, *args, **kwargs):
+    # Auto-assign budget if category matches and date is within budget period
+    if not self.budget and self.category:
+        matching_budget = Budget.objects.filter(
+            user=self.user,
+            category=self.category,
+            start_date__lte=self.date,
+            end_date__gte=self.date
+        ).first()
+        if matching_budget:
+            self.budget = matching_budget
+    
+    super().save(*args, **kwargs)
+
+    # Ensure the budget's spent amount and progress are updated
+    if self.budget:
+        self.budget.update_spent_amount()
