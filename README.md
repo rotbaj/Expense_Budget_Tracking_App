@@ -41,31 +41,6 @@ A full-featured personal finance application built with Django and Django REST F
 - JWT Authentication
 - Filtering/Search capabilities
 
-## Project Structure 📂
-expense_tracker/
-├── budgets/ # Budget management app
-│ ├── models.py # Budget models and categories
-│ ├── views.py # Budget views (DRF + Template)
-│ ├── serializers.py # Budget serializers
-│ └── templates/ # Budget templates
-│
-├── expenses/ # Expense tracking app
-│ ├── models.py # Expense models
-│ ├── views.py # Expense views
-│ └── ...
-│
-├── incomes/ # Income management app
-│ └── ...
-│
-├── reports/ # Financial reporting
-│ ├── models.py # Report presets
-│ ├── views.py # Report generation
-│ └── ...
-│
-├── templates/ # Base templates
-├── static/ # Static files
-└── manage.py # Django management
-
 
 ## Setup Instructions 🚀
 
