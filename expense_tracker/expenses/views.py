@@ -6,6 +6,7 @@ from .serializers import ExpenseSerializer, CategorySerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .forms import ExpenseForm
 
 class ExpenseViewSet(viewsets.ModelViewSet):
     serializer_class = ExpenseSerializer
@@ -44,8 +45,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 class ExpenseCreateView(LoginRequiredMixin, CreateView):
     model = Expense
+    form_class = ExpenseForm
     template_name = 'expenses/form.html'
-    fields = ['amount', 'category', 'description', 'date']
     
     # Automatically set the logged-in user for the expense
     def form_valid(self, form):
@@ -62,6 +63,7 @@ class ExpenseCreateView(LoginRequiredMixin, CreateView):
 
 class ExpenseEditView(UpdateView):
     model = Expense
+    form_class = ExpenseForm
     fields = ['amount', 'category', 'description', 'date']
     template_name = 'expenses/form.html'
     

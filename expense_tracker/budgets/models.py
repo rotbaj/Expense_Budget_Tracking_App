@@ -2,6 +2,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.conf import settings
+from django.db.models import Sum
 
 class Budget(models.Model):
     BUDGET_CATEGORIES = [
@@ -35,3 +36,15 @@ class Budget(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()  # Runs validation before saving
         super().save(*args, **kwargs)
+
+    @property
+    def spent_amount(self):
+        return self.expenses.aggregate(total=Sum('amount'))['total'] or 0
+    
+    @property
+    def remaining_amount(self):
+        return self.amount - self.spent_amount
+    
+    @property
+    def progress_percentage(self):
+        return (self.spent_amount / self.amount) * 100 if self.amount > 0 else 0

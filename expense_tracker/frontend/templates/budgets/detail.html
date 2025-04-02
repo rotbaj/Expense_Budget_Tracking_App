@@ -55,7 +55,58 @@
             </div>
         </div>
     </div>
-
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>Budget Progress</h5>
+        </div>
+        <div class="card-body">
+            <div class="progress mb-3" style="height: 30px;">
+                <div class="progress-bar {% if budget.progress_percentage > 100 %}bg-danger{% else %}bg-success{% endif %}" 
+                     role="progressbar" 
+                     style="width: {{ budget.progress_percentage }}%"
+                     aria-valuenow="{{ budget.progress_percentage }}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                    {{ budget.progress_percentage|floatformat:1 }}%
+                </div>
+            </div>
+            <p>
+                <strong>Budget:</strong> ${{ budget.amount|intcomma }}<br>
+                <strong>Spent:</strong> ${{ budget.spent_amount|intcomma }}<br>
+                <strong>Remaining:</strong> ${{ budget.remaining_amount|intcomma }}
+            </p>
+        </div>
+    </div>
+    
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>Associated Expenses</h5>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense.date }}</td>
+                        <td>${{ expense.amount|intcomma }}</td>
+                        <td>{{ expense.description|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No expenses associated with this budget</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
     <div class="mt-4 text-end">
         <a href="{% url 'budget_delete' budget.id %}" class="btn btn-danger">
             <i class="bi bi-trash"></i> Delete Budget

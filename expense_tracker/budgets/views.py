@@ -1,14 +1,17 @@
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, generics
 from rest_framework.permissions import IsAuthenticated
-from .models import Budget
+from django_filters.rest_framework import DjangoFilterBackend
 from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.urls import reverse_lazy
-from .serializers import BudgetSerializer
-from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect
 
+from .models import Budget
+from .serializers import BudgetSerializer
+
+
+# DRF ViewSet for API
 class BudgetViewSet(viewsets.ModelViewSet):
     serializer_class = BudgetSerializer
     permission_classes = [IsAuthenticated]
@@ -23,6 +26,21 @@ class BudgetViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+
+# API List View
+class BudgetListAPIView(generics.ListAPIView):
+    serializer_class = BudgetSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        queryset = Budget.objects.filter(user=self.request.user)
+        category = self.request.query_params.get('category')
+        if category:
+            queryset = queryset.filter(category=category)
+        return queryset
+
+
+# Django Class-based Views for Templates
 class BudgetListView(LoginRequiredMixin, ListView):
     model = Budget
     template_name = 'budgets/list.html' 
@@ -30,6 +48,7 @@ class BudgetListView(LoginRequiredMixin, ListView):
     
     def get_queryset(self):
         return Budget.objects.filter(user=self.request.user)
+
 
 class BudgetCreateView(LoginRequiredMixin, CreateView):
     model = Budget
@@ -53,6 +72,7 @@ class BudgetCreateView(LoginRequiredMixin, CreateView):
         form.fields['end_date'].widget.attrs.update({'class': 'datepicker'})
         return form
 
+
 class BudgetUpdateView(LoginRequiredMixin, UpdateView):
     model = Budget
     fields = ['amount', 'category', 'start_date', 'end_date', 'description']
@@ -66,10 +86,16 @@ class BudgetUpdateView(LoginRequiredMixin, UpdateView):
         messages.success(self.request, 'Budget updated successfully!')
         return super().form_valid(form)
 
+
 class BudgetDetailView(LoginRequiredMixin, DetailView):
     model = Budget
     template_name = 'budgets/detail.html'
     context_object_name = 'budget'
-    
-    def get_queryset(self):
-        return Budget.objects.filter(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['expenses'] = self.object.expenses.all()
+        context['spent_amount'] = self.object.spent_amount
+        context['remaining_amount'] = self.object.remaining_amount
+        context['progress_percentage'] = self.object.progress_percentage
+        return context

@@ -58,7 +58,15 @@
                     </div>
                     {% endif %}
                 </div>
-
+                <div class="mb-3">
+                    <label for="{{ form.budget.id_for_label }}" class="form-label">Budget</label>
+                    {{ form.budget }}
+                    {% if form.budget.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.budget.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
                 <div class="mb-3">
                     <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
                     {{ form.description }}
@@ -92,4 +100,36 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+<script>
+    document.getElementById('id_category').addEventListener('change', function() {
+        const category = this.value;
+        const budgetSelect = document.getElementById('id_budget');
+        
+        // Clear current options
+        budgetSelect.innerHTML = '';
+        
+        // Add empty option
+        const emptyOption = document.createElement('option');
+        emptyOption.value = '';
+        emptyOption.textContent = '---------';
+        budgetSelect.appendChild(emptyOption);
+        
+        // Fetch matching budgets
+        if (category) {
+            fetch(`/api/budgets/?category=${category}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(budget => {
+                        const option = document.createElement('option');
+                        option.value = budget.id;
+                        option.textContent = `${budget.get_category_display()} - $${budget.amount}`;
+                        if (budget.id == "{{ form.instance.budget.id|default:'' }}") {
+                            option.selected = true;
+                        }
+                        budgetSelect.appendChild(option);
+                    });
+                });
+        }
+    });
+    </script>
 {% endblock %}

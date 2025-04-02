@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Expense, Category
+from budgets.models import Budget 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,15 +15,23 @@ class ExpenseSerializer(serializers.ModelSerializer):
         source='category',
         write_only=True
     )
+    budget = serializers.PrimaryKeyRelatedField(  # Add this field
+        queryset=Budget.objects.all(),
+        required=False,
+        allow_null=True
+    )
 
     class Meta:
         model = Expense
         fields = [
             'id', 'amount', 'category', 'category_id',
-            'description', 'date', 'created_at', 'updated_at'
+            'budget', 'description', 'date', 'created_at', 'updated_at'
         ]
 
-    def validate_amount(self, value):
-        if value <= 0:
-            raise serializers.ValidationError("Amount must be positive")
-        return value
+    def validate(self, data):
+        # Validate that budget category matches expense category if budget is set
+        if data.get('budget') and data['budget'].category != data['category']:
+            raise serializers.ValidationError(
+                "Expense category must match budget category"
+            )
+        return data
