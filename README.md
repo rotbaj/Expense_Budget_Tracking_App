@@ -1,67 +1,115 @@
-# Step 1: Project Setup and Configuration
+# Expense & Budget Tracking App 💰📊
 
-## Objective
+[![Django](https://img.shields.io/badge/Django-3.2-green.svg)](https://www.djangoproject.com/)
+[![DRF](https://img.shields.io/badge/DRF-3.12-blue.svg)](https://www.django-rest-framework.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-To set up a new Django project for the Expense & Budget Tracker, including environment configuration, app creation, initial models, and database setup.
+A full-featured personal finance application built with Django and Django REST Framework that helps users track expenses, manage budgets, and generate financial reports.
 
-## Task Description
 
-### Step 1: Project Setup
+## Features ✨
 
-* Install Django:
+### Core Functionality
+- **Expense Tracking**: Record and categorize daily expenses
+- **Income Management**: Track income sources and amounts
+- **Budget Planning**: Set monthly budgets by categories
+- **Financial Reports**: Generate spending insights and trends
+- **User Authentication**: Secure signup/login system
+
+### Advanced Features
+- Budget progress tracking with visual indicators
+- Spending analysis by category/time period
+- Income vs. expense comparisons
+- Custom report presets
+- Responsive web interface
+
+## Tech Stack 🛠️
+
+**Backend:**
+- Python 3.9+
+- Django 3.2
+- Django REST Framework
+- PostgreSQL (default SQLite for development)
+
+**Frontend:**
+- HTML5, CSS3, JavaScript
+- Bootstrap 5
+- Chart.js for visualizations
+
+**APIs:**
+- RESTful API endpoints
+- JWT Authentication
+- Filtering/Search capabilities
+
+## Project Structure 📂
+expense_tracker/
+├── budgets/ # Budget management app
+│ ├── models.py # Budget models and categories
+│ ├── views.py # Budget views (DRF + Template)
+│ ├── serializers.py # Budget serializers
+│ └── templates/ # Budget templates
+│
+├── expenses/ # Expense tracking app
+│ ├── models.py # Expense models
+│ ├── views.py # Expense views
+│ └── ...
+│
+├── incomes/ # Income management app
+│ └── ...
+│
+├── reports/ # Financial reporting
+│ ├── models.py # Report presets
+│ ├── views.py # Report generation
+│ └── ...
+│
+├── templates/ # Base templates
+├── static/ # Static files
+└── manage.py # Django management
+
+
+## Setup Instructions 🚀
+
+1.  **Clone the repository:**
+
     ```bash
-    pip install django
+    git clone <repository_url>
+    cd Expense_Budget_Tracking_App
     ```
-* Install Django REST Framework:
-    ```bash
-    pip install djangorestframework
-    ```
-* Start a new Django project:
-    ```bash
-    django-admin startproject expense_tracker
-    ```
-* Navigate into the project directory:
-    ```bash
-    cd expense_tracker
-    ```
-* Create a new Django app:
-    ```bash
-    python manage.py startapp core
-    ```
-* Register the 'core' app and 'rest\_framework' in `INSTALLED_APPS` in `expense_tracker/settings.py`.
 
-### Step 2: Configure the Database
+2.  **Create a virtual environment (recommended):**
 
-* Configure PostgreSQL or use SQLite by adjusting the `DATABASES` setting in `settings.py`.
-
-### Step 3: Define Models
-
-* Create models in `core/models.py` based on the ERD:
-    * `User`: Use Django's built-in `User` model.
-    * `Expense`:
-        * `user_id` (ForeignKey to `User`)
-        * `amount` (Decimal)
-        * `category` (String)  (e.g., Food, Rent, Entertainment) [cite: 5, 28]
-        * `description` (Text, Optional)
-        * `date` (Date)
-    * `Income`:
-        * `user_id` (ForeignKey to `User`)
-        * `amount` (Decimal)
-        * `category` (String) (e.g., Salary, Freelance, Investments) [cite: 7, 28]
-        * `description` (Text, Optional)
-        * `date` (Date)
-    * `Budget`:
-        * `user_id` (ForeignKey to `User`)
-        * `amount` (Decimal)
-        * `category` (String)  (e.g., Food, Rent, Transport) [cite: 28, 29]
-        * `description` (Text, Optional)
-        * `start_date` (Date)
-        * `end_date` (Date)
-* Run migrations:
     ```bash
-    python manage.py makemigrations core
+    python -m venv venv
+    source venv/bin/activate  # On Linux/macOS
+    venv\Scripts\activate  # On Windows
     ```
+
+3.  **Install dependencies:**
+
+    ```bash
+    pip install -r requirements.txt  # You'll need to create this file
+    ```
+
+4.  **Apply migrations:**
+
     ```bash
     python manage.py migrate
     ```
 
+5.  **Create a superuser (for admin access):**
+
+    ```bash
+    python manage.py createsuperuser
+    ```
+
+6.  **Run the development server:**
+
+    ```bash
+    python manage.py runserver
+    ```
+
+7.  **Access the application in your browser:**
+
+    ```
+    http://localhost:8000/
+    ```
