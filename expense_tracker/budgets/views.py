@@ -97,9 +97,9 @@ class BudgetDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['expenses'] = self.object.expenses.all()
-        context['spent_amount'] = self.object.spent_amount
-        context['remaining_amount'] = self.object.remaining_amount
-        context['progress_percentage'] = self.object.progress_percentage
+        context['spent_amount'] = budget.spent_amount()
+        context['remaining_amount'] = budget.remaining_amount()
+        context['progress_percentage'] = budget.progress_percentage()
         return context
 
 @login_required
@@ -108,4 +108,4 @@ def toggle_budget_status(request, budget_id):
     budget.is_active = not budget.is_active
     budget.save()
     messages.success(request, f"Budget '{budget.category}' is now {'Active' if budget.is_active else 'Inactive'}.")
-    return redirect('budget_list')  # Change to your actual budget list view name
+    return redirect('budget_list')  

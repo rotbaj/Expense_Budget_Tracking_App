@@ -7,6 +7,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import ExpenseForm
+from django.contrib import messages
 
 class ExpenseViewSet(viewsets.ModelViewSet):
     serializer_class = ExpenseSerializer
@@ -47,10 +48,12 @@ class ExpenseCreateView(LoginRequiredMixin, CreateView):
     model = Expense
     form_class = ExpenseForm
     template_name = 'expenses/form.html'
+    success_url = reverse_lazy('report_dashboard')
     
     # Automatically set the logged-in user for the expense
     def form_valid(self, form):
         form.instance.user = self.request.user
+        messages.success(self.request, 'Expense added successfully!')
         return super().form_valid(form)
 
     def get_success_url(self):

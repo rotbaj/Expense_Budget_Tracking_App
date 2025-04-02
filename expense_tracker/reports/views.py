@@ -136,31 +136,24 @@ class ReportDashboardView(View):
             ).aggregate(total=Sum('amount'))['total'] or 0,
         }
 
-        # 2. Budget Progress
-        active_budgets = Budget.objects.filter(
-            Q(user=request.user) &
-            Q(start_date__lte=today) &
-            (Q(end_date__gte=today) | Q(end_date__isnull=True))
+        # 2. Budget Progress -
+        # Get all budgets that are currently active (between start and end dates)
+        budgets = Budget.objects.filter(
+            user=request.user,
+            start_date__lte=today,
+            end_date__gte=today,
+            is_active=True
         )
 
         budget_progress = []
-        for budget in active_budgets:
-            spent = Expense.objects.filter(
-                user=request.user,
-                category=budget.category,
-                date__gte=budget.start_date,
-                date__lte=budget.end_date if budget.end_date else today
-            ).aggregate(total=Sum('amount'))['total'] or 0
-
-            progress = (spent / budget.amount) * 100 if budget.amount > 0 else 0
-
+        for budget in budgets:
             budget_progress.append({
                 'category': budget.get_category_display(),
                 'budget': budget.amount,
-                'spent': spent,
-                'remaining': budget.amount - spent,
-                'progress': round(progress, 1),
-                'is_over': spent > budget.amount
+                'spent': budget.spent_amount,
+                'remaining': budget.remaining_amount,
+                'progress': round(budget.progress_percentage, 1),
+                'is_over': budget.spent_amount > budget.amount
             })
 
         # 3. Recent Reports
@@ -170,7 +163,7 @@ class ReportDashboardView(View):
 
         context = {
             'income_expense': income_expense_data,
-            'budget_progress': budget_progress,  # Ensure this updates
+            'budget_progress': budget_progress,
             'recent_reports': recent_reports,
             'current_month': current_month_start.strftime('%B %Y'),
         }
